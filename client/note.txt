@@ -1,2 +1,1 @@
-emcc client.cpp Vector.cpp Entity.cpp -O3 -sMODULARIZE -sWASM -sEXPORTED_RUNTIME_METHODS="['allocateUTF8', 'HEAP8', 'HEAPU8', 'HEAPU32', 'HEAPF32', 'HEAPU64', 'HEAPF64', 'ccall', 'cwrap', 'stringToUTF8', 'UTF8ToString', 'lengthBytesUTF8']" -sEXPORTED_FUNCTIONS="['_free']" -sSTANDALONE_WASM -sEXPORT_ES6 --bind -o client.js
-emcc client.cpp Vector.cpp Entity.cpp enum.cpp Camera.cpp Tick.cpp -O3 -sMODULARIZE -sWASM -sEXPORTED_RUNTIME_METHODS="['allocateUTF8', 'HEAP8', 'HEAPU8', 'HEAPU32', 'HEAPF32', 'HEAPU64', 'HEAPF64', 'ccall', 'cwrap', 'stringToUTF8', 'UTF8ToString', 'lengthBytesUTF8']" -sEXPORTED_FUNCTIONS="['_free']" -sEXPORT_ES6 --bind -o client.js
+Mẹo mày bé
