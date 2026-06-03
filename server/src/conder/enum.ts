@@ -18,4 +18,6 @@ export type INPUTS = {
 export enum ENTITIES {
   ENTITY,
   ZOMBIE,
+
+  AUTO_TURRET
 }

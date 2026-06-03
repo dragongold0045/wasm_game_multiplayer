@@ -42,7 +42,7 @@ export class MatchRoom extends Room {
     const entity = new Entity(this);
     entity.spawn();
 
-    if(Math.random() < .5) entity.TYPE = ENTITIES.ZOMBIE;
+    if(Math.random() < .5) entity.TYPE = ENTITIES.AUTO_TURRET;
 
     player.setControl(entity);
 

@@ -3,9 +3,9 @@
 
 std::string getTypeEntityName(ENTITIES ID) {
   switch(ID) {
-    case ENTITIES::ENTITY:  return "ENTITY";
-    case ENTITIES::ZOMBIE:  return "ZOMBIE";
-    default:                return "ENTITY";
+    case ENTITIES::ENTITY:default:  return "ENTITY";
+    case ENTITIES::ZOMBIE:          return "ZOMBIE";
+    case ENTITIES::AUTOTURRET:      return "AUTOTURRET";
   }
 }
 

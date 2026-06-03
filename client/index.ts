@@ -43,35 +43,41 @@ window.onload = async () => {
     });
 
     ["keydown", "keyup"].forEach((event: "keydown" | "keyup") => {
-    canvas.addEventListener(event, (ev) => {
-      switch(ev.key.toLowerCase()) {
-        case "w":case"arrowup":
-          inputs.MOVEMENT.UP = event === "keydown";
-          break;
-        case "a":case"arrowleft":
-          inputs.MOVEMENT.LEFT = event === "keydown";
-          break;
-        case "s":case"arrowdown":
-          inputs.MOVEMENT.DOWN = event === "keydown";
-          break;
-        case "d":case"arrowright":
-          inputs.MOVEMENT.RIGHT = event === "keydown";
-          break;
-        default:
-          inputs.KEYBOARD.set(ev.key.toLowerCase(), event === "keydown");
-          break;
-      }
-      // ev.preventDefault(); // Prevent default tab behavior
-    });
-  })
+      canvas.addEventListener(event, (ev) => {
+        switch(ev.key.toLowerCase()) {
+          case "w":case"arrowup":
+            inputs.MOVEMENT.UP = event === "keydown";
+            break;
+          case "a":case"arrowleft":
+            inputs.MOVEMENT.LEFT = event === "keydown";
+            break;
+          case "s":case"arrowdown":
+            inputs.MOVEMENT.DOWN = event === "keydown";
+            break;
+          case "d":case"arrowright":
+            inputs.MOVEMENT.RIGHT = event === "keydown";
+            break;
+          default:
+            inputs.KEYBOARD.set(ev.key.toLowerCase(), event === "keydown");
+            break;
+        }
+        // ev.preventDefault(); // Prevent default tab behavior
+      });
+    })
 
     let animateId: number;
     const animate = () => {
       animateId = requestAnimationFrame(animate);
       if(MatchRoom.state) MatchRoom.state.entities?.forEach((entity, ID) => {
-        const result = Module.updatePositionOfEntity(ID, entity.position.x, entity.position.y);
+        Module.updatePositionOfEntity(ID, entity.position.x, entity.position.y);
+        Module.updatePhysicsOfEntity(ID, entity.physics.size, entity.physics.angle);
       });
       Module._looping();
+      
+      const cursor = Module.getCursorPosition<{ x: number , y: number }>();
+
+      inputs.MOUSE.x = cursor.x;
+      inputs.MOUSE.y = cursor.y;
     }
     animate();
 

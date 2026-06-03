@@ -3,7 +3,7 @@
 #include "enum.h"
 #include <emscripten/bind.h>
 
-#include "./Entities/Zombie.h"
+#include "EntitiesList.h"
 
 using namespace std;
 
@@ -19,6 +19,10 @@ void addNewEntity(createOptions options) {
     case ENTITIES::ZOMBIE:
       result = make_shared<Zombie>(startPos);
       break;
+
+    case ENTITIES::AUTOTURRET:
+      result = make_shared<AutoTurret>(startPos);
+      break;
         
     case ENTITIES::ENTITY:
     default:
@@ -29,6 +33,8 @@ void addNewEntity(createOptions options) {
   result->ID = options.ID;
   result->physics.size = options.size;
   result->physics.angle = options.angle;
+
+  result->init();
 
   entities[options.ID] = result;
 }
@@ -45,6 +51,21 @@ bool updatePositionOfEntity(string ID, float x, float y) {
   } catch (const std::out_of_range& e) {
     return false;
   }
+}
+
+bool updatePhysicsOfEntity(string ID, float size, float angle) {
+  try {
+    auto& entity = entities.at(ID);
+    entity->physics.size = size;
+    entity->physics.angle = angle;
+    return true;
+  } catch (const std::out_of_range& e) {
+    return false;
+  }
+}
+
+EMSCRIPTEN_BINDINGS(update_entity) {
+  emscripten::function("updatePhysicsOfEntity", &updatePhysicsOfEntity);
 }
 
 string controllerID = "NO-CONTROL";
@@ -71,25 +92,27 @@ void Ticker(val ctx) {
     float hitsizeCamera = entity->physics.size * 2; 
 
     if(
-      entity->position.x - hitsizeCamera < camera.position.x - camera.viewport.width / 2 ||
-      entity->position.y - hitsizeCamera < camera.position.y - camera.viewport.height / 2 ||
-      entity->position.x + hitsizeCamera > camera.position.x + camera.viewport.width / 2 ||
-      entity->position.y + hitsizeCamera > camera.position.y + camera.viewport.height / 2
+      entity->position.x + hitsizeCamera < camera.position.x - camera.viewport.width / 2 ||
+      entity->position.y + hitsizeCamera < camera.position.y - camera.viewport.height / 2 ||
+      entity->position.x - hitsizeCamera > camera.position.x + camera.viewport.width / 2 ||
+      entity->position.y - hitsizeCamera > camera.position.y + camera.viewport.height / 2
     ) continue;
 
     entity->tick();
     entity->render(ctx);
 
-    ctx.call<void>("save");
-    ctx.call<void>("translate", entity->position.x, entity->position.y);
-    ctx.set("font", "bold 30px Ubuntu-B");
-    ctx.set("textAlign", "center");
-    ctx.set("fillStyle", "#ffffff");
-    ctx.call<void>("fillText", entity->relations.name.value, 0, -entity->physics.size - 10);
-    ctx.set("strokeStyle", "#333333");
-    ctx.set("lineWidth", 1);
-    ctx.call<void>("strokeText", entity->relations.name.value, 0, -entity->physics.size - 10);
-    ctx.call<void>("restore");
+    if(entity->visibleName) {
+      ctx.call<void>("save");
+      ctx.call<void>("translate", entity->position.x, entity->position.y);
+      ctx.set("font", "bold 30px Ubuntu-B");
+      ctx.set("textAlign", "center");
+      ctx.set("fillStyle", "#ffffff");
+      ctx.call<void>("fillText", entity->relations.name.value, 0, -entity->physics.size - entity->offsetName);
+      ctx.set("strokeStyle", "#333333");
+      ctx.set("lineWidth", 1);
+      ctx.call<void>("strokeText", entity->relations.name.value, 0, -entity->physics.size - entity->offsetName);
+      ctx.call<void>("restore");
+    }
   }
 }
 

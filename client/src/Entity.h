@@ -47,6 +47,11 @@ class Entity {
       Physics(float size, float angle);
     };
 
+    float offsetName = 10.0f;
+    bool visibleName = true;
+
+    virtual void init();
+
     struct Relations {
       std::string rootId = "NO-ROOT";
       std::string ownerId = "NO-OWNER";

@@ -61,8 +61,25 @@ ArenaOptionOutput ArenaOutputData() {
   );
 }
 
+struct cursorPosition {
+  float x, y;
+};
+
+cursorPosition getCursorPosition() {
+  cursorPosition cursor;
+  cursor.x = cursorX / camera.BASE_WIDTH * camera.viewport.width - camera.viewport.width / 2;
+  cursor.y = cursorY / camera.BASE_HEIGHT * camera.viewport.height - camera.viewport.height / 2;
+
+  return cursor;
+}
+
 EMSCRIPTEN_BINDINGS(client_side) {
   emscripten::function("handleError", &handleError);
+
+  emscripten::value_object<cursorPosition>("cursorPosition")
+  .field("x", &cursorPosition::x)
+  .field("y", &cursorPosition::y);
+  emscripten::function("getCursorPosition", &getCursorPosition);
 
   emscripten::value_object<ArenaOptionOutput>("ArenaOptionOutput")
   .field("width", &ArenaOptionOutput::width)

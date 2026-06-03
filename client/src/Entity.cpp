@@ -34,6 +34,8 @@ void Entity::render(val ctx) {
   ctx.call<void>("closePath");
 };
 
+void Entity::init() {};
+
 void Entity::updatePosition(Vector v) {
   // position = Lerp(position, v, 0.2f);
   if(position.x == 0) position.x = v.x;
