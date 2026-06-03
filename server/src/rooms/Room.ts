@@ -3,9 +3,10 @@ import { RoomState } from "./schema/RoomState.js";
 import { PlayerController } from "./schema/PlayerController.js";
 import Entity from "../entities/Entity.js";
 import Vector from "../native/Vector.js";
+import { ENTITIES, INPUTS } from "../conder/enum.js";
 
 export class MatchRoom extends Room {
-  maxClients = 4;
+  maxClients = 4000;
   state = new RoomState();
 
   messages = {
@@ -21,6 +22,12 @@ export class MatchRoom extends Room {
     /**
      * Called when a new room is created.
      */
+    this.onMessage("inputs", (client, inputs: INPUTS) => {
+      const player = this.state.players.get(client.sessionId);
+      if(!player) return;
+      player.onInputs(inputs);
+      // console.log(inputs);
+    });
     this.startTick();
   }
 
@@ -34,6 +41,8 @@ export class MatchRoom extends Room {
 
     const entity = new Entity(this);
     entity.spawn();
+
+    if(Math.random() < .5) entity.TYPE = ENTITIES.ZOMBIE;
 
     player.setControl(entity);
 
@@ -70,22 +79,22 @@ export class MatchRoom extends Room {
         const size = entity.collide.collisionMapWithSize ? entity.physics.size : 0;
 
         if(entity.position.x - size < -area.width / 2) {
-          entity.position.x = -area.width / 2;
+          entity.position.x = -area.width / 2 + size;
           entity.velocity.x = 0;
         }
 
         if(entity.position.x + size > area.width / 2) {
-          entity.position.x = area.width / 2;
+          entity.position.x = area.width / 2 - size;
           entity.velocity.x = 0;
         }
 
         if(entity.position.y - size < -area.height / 2) {
-          entity.position.y = -area.height / 2;
+          entity.position.y = -area.height / 2 + size;
           entity.velocity.y = 0;
         }
 
         if(entity.position.y + size > area.height / 2) {
-          entity.position.y = area.height / 2;
+          entity.position.y = area.height / 2 - size;
           entity.velocity.y = 0;
         }
       }

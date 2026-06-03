@@ -42,6 +42,9 @@ class Entity {
   public:
     struct Physics {
       float size, angle;
+
+      Physics();
+      Physics(float size, float angle);
     };
 
     struct Relations {
@@ -61,8 +64,11 @@ class Entity {
       bool invisible = false;
     };
 
+    struct CameraEntity {
+      int viewport = 1500, viewZ = 1500, scaler = 30;
+    };
     std::string ID = "NO-ID";
-    Vector position = Vector(0, 0);
+    Vector position;
 
     ENTITIES TYPE = ENTITIES::ENTITY;
 
@@ -74,10 +80,12 @@ class Entity {
       std::uniform_real_distribution<float> dis_angle(0.0f, 2.0f * PI);
       physics.angle = dis_angle(gen);
     };
+    Entity(Vector position);
     Entity(
       Vector position,
       Physics physics,
       Relations relations,
+      CameraEntity camera,
       std::optional<Inputs> inputs,
       std::optional<Health> health
     ); 
@@ -88,12 +96,16 @@ class Entity {
 
     Collide collide;
 
+    CameraEntity camera;
+
     std::optional<Inputs> inputs;
     std::optional<Health> health;
 
     virtual void render(val ctx);
 
     virtual ~Entity() = default;
+
+    virtual void tick();
 
     void updatePosition(Vector v);
 

@@ -18,4 +18,6 @@ public:
 
 Vector Lerp(const Vector& start, const Vector& end, float t);
 
+float linear(float s, float e, float t);
+
 #endif

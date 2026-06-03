@@ -7,10 +7,14 @@
 #include "Vector.h"
 #include "Entity.h"
 #include "enum.h"
+#include "Camera.h"
+#include <memory>
 
 using namespace std;
 
-inline unordered_map<string, Entity> entities;
+inline unordered_map<string, shared_ptr<Entity>> entities;
+
+inline Camera camera;
 
 struct XYOption {
   float x, y;
@@ -18,16 +22,19 @@ struct XYOption {
 
 struct createOptions {
   string ID;
+  int TYPE;
   float size, angle;
   XYOption position;
 };
 
-Entity addNewEntity(createOptions options);
+void addNewEntity(createOptions options);
 
 void removeEntity(string ID);
 
 void Ticker(val ctx);
 
 bool updatePositionOfEntity(string ID, float x, float y);
+
+void setControl(string ID);
 
 #endif

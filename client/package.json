@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "npx parcel serve index.html"
+    "start": "npx parcel serve index.html fonts/**"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@parcel/transformer-raw": "^2.16.4",
     "@types/node": "^25.9.1",
     "buffer": "^6.0.3",
     "dotenv": "^17.4.2",

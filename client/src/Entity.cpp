@@ -2,15 +2,21 @@
 #include "Vector.h"
 #include <emscripten/bind.h>
 
+Entity::Physics::Physics(): size(0.0f) , angle(0.0f) {};
+Entity::Physics::Physics(float size, float angle): size(size) , angle(angle) {};
+
+Entity::Entity(Vector position): position(position) {};
 Entity::Entity(
   Vector position,
   Entity::Physics physics,
   Entity::Relations relations,
+  Entity::CameraEntity camera,
   std::optional<Inputs> inputs,
   std::optional<Health> health
 ) : position(position),
     physics(physics),
     relations(relations),
+    camera(camera),
     inputs(inputs),
     health(health),
     died(false) 
@@ -29,8 +35,14 @@ void Entity::render(val ctx) {
 };
 
 void Entity::updatePosition(Vector v) {
-  position = Lerp(position, v, 0.2f);
+  // position = Lerp(position, v, 0.2f);
+  if(position.x == 0) position.x = v.x;
+  else position.x = linear(position.x, v.x, 0.2f);
+  if(position.y == 0) position.y = v.y;
+  else position.y = linear(position.y, v.y, 0.2f);
 }
+
+void Entity::tick() {}
 
 void Entity::setPosition(float x, float y) {
   position.x = x;
@@ -52,6 +64,12 @@ EMSCRIPTEN_BINDINGS(entity) {
     .property("ownerId", &Entity::Relations::ownerId)
     .property("invisible", &Entity::Relations::invisible);
 
+  emscripten::class_<Entity::CameraEntity>("CameraEntity")
+    .constructor<>()
+    .property("viewZ", &Entity::CameraEntity::viewZ)
+    .property("viewport", &Entity::CameraEntity::viewport)
+    .property("scaler", &Entity::CameraEntity::scaler);
+
   emscripten::class_<Inputs>("Inputs")
     .constructor<>()
     .property("speedMovement", &Inputs::speedMovement); 
@@ -70,13 +88,14 @@ EMSCRIPTEN_BINDINGS(entity) {
 
   emscripten::class_<Entity>("Entity")
     .constructor<>() 
-    .constructor<Vector, Entity::Physics, Entity::Relations, std::optional<Inputs>, std::optional<Health>>()
+    .constructor<Vector, Entity::Physics, Entity::Relations, Entity::CameraEntity, std::optional<Inputs>, std::optional<Health>>()
     .property("ID", &Entity::ID)
     .property("position", &Entity::position)
     .property("TYPE", &Entity::TYPE)
     .property("physics", &Entity::physics)
     .property("relations", &Entity::relations)
     .property("collide", &Entity::collide)
+    .property("camera", &Entity::camera)
     .property("died", &Entity::died)
 
     .function("hasHealth", +[](const Entity& self) { return self.health.has_value(); })

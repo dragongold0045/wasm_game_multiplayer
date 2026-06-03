@@ -8,6 +8,8 @@ import Health from "./Features/Health.js";
 import { nanoid } from "nanoid";
 import { PlayerController } from "../rooms/schema/PlayerController.js";
 import Collide from "./Features/Collide.js";
+import CameraEntity from "./Features/CameraEntity.js";
+import { ENTITIES } from "../conder/enum.js";
 
 class Physics extends Schema {
   @type("float64") public mass: number = 80;
@@ -40,6 +42,8 @@ class Relations extends Schema {
 export default class Entity extends Schema {
   @type("string") public readonly ID = nanoid();
 
+  @type("number") public TYPE = ENTITIES.ENTITY;
+
   @type(Vector) public position = new Vector;
 
   @type(Physics) public physics = new Physics;
@@ -53,6 +57,8 @@ export default class Entity extends Schema {
   @type(Collide) public collide = new Collide(this);
 
   @type(Vector) public velocity = new Vector;
+
+  @type(CameraEntity) public camera = new CameraEntity(this);
 
   @type("boolean") public died = false;
 
@@ -109,7 +115,7 @@ export default class Entity extends Schema {
 
   // init entity before spawning
   protected init() {
-    this.velocity = Vector.CreateFromAngle(Math.PI*2*Math.random(), 1600);
+    // this.velocity = Vector.CreateFromAngle(Math.PI*2*Math.random(), 400);
   }
 
   // check that if entity existed

@@ -4,7 +4,6 @@
 #include <emscripten.h>
 #include <emscripten/val.h>
 #include <emscripten/bind.h>
-#include "Vector.h"
 #include "Entity.h"
 #include "Tick.h"
 
@@ -38,40 +37,6 @@ class Arena {
 };
 
 Arena arena(500.0f, 500.0f);
-
-const int Z_DEFAULT_VIEW = 1500;
-
-class Camera {
-  public:
-    Vector position = Vector(0, 0);
-    struct viewport {
-      float width = 500, height = 500, zView = Z_DEFAULT_VIEW;
-      float scale[2] = { 1.0f , 1.0f };
-    } viewport;
-
-    float BASE_WIDTH = 500, BASE_HEIGHT = 500;
-
-    void moveTo(float x, float y) {
-      this->position.x = x;
-      this->position.y = y;
-      this->updateViewport();
-    };
-
-    void zoomTo(float z) {
-      this->viewport.zView = z;
-      this->updateViewport();
-    }
-
-    void updateViewport() {
-      float scale = this->viewport.zView / Z_DEFAULT_VIEW;
-
-      this->viewport.width = this->BASE_WIDTH * scale;
-      this->viewport.height = this->BASE_HEIGHT * scale;
-      viewport.scale[0] = viewport.scale[1] = scale;
-    };
-};
-
-Camera camera;
 
 void handleError(int code, string msg) {
   // handle error from server (code : 1 - 404)

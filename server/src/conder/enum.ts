@@ -14,3 +14,8 @@ export type INPUTS = {
   };
   KEYBOARD: Map<string, boolean>; // e.g. "w", "a", "s", "d"
 }
+
+export enum ENTITIES {
+  ENTITY,
+  ZOMBIE,
+}

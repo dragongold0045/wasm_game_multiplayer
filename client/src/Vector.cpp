@@ -35,3 +35,9 @@ Vector Lerp(const Vector& start, const Vector& end, float t) {
   float newY = start.y + t * (end.y - start.y);
   return Vector(newX, newY);
 }
+
+float linear(float s, float e, float t) {
+  if(t < 0.0f) t = 0.0f;
+  if(t > 1.0f) t = 1.0f;
+  return s + t * (e - s);
+}

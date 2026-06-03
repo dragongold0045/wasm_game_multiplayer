@@ -2,6 +2,7 @@ import { Room , getStateCallbacks } from "@colyseus/sdk";
 import { Module } from "./wasm";
 import { readText } from "./wasmsupporter";
 import { RoomState } from "../outside_type";
+import inputs from "./inputs";
 
 export default function(room: Room<RoomState>) {
   // if wasm doesn't exist
@@ -31,7 +32,7 @@ export default function(room: Room<RoomState>) {
   });
 
   room.onMessage("tick", () => {
-
+    room.send("inputs", inputs);
   });
 
   const $ = getStateCallbacks(room);
@@ -39,11 +40,11 @@ export default function(room: Room<RoomState>) {
   $(room.state).entities.onAdd((item, id) => {
     Module.addNewEntity({
       ID: id,
+      TYPE: item.TYPE,
       size: item.physics.size,
       angle: item.physics.angle,
-      position: item.position.toJSON()
+      position: item.position.toJSON(),
     })
-    console.log(item.position.toJSON(), id);
   });
 
   $(room.state).entities.onRemove((item, id) => {
@@ -56,6 +57,11 @@ export default function(room: Room<RoomState>) {
     console.log("ArenaOption (previous update):", Module.currentArenaOptions());
     Module._setArenaSize(room.state.arena.width, room.state.arena.height);
     console.log("ArenaOption (new):", Module.currentArenaOptions());
+  });
+
+  room.onMessage("control", (ID: string) => {
+    console.log("New controller ID", ID);
+    Module.setControl(ID);
   });
 
   room.onError((code, message) => Module.handleError(code, message));

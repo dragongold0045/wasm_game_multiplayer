@@ -5,6 +5,7 @@
 
 enum class ENTITIES : int {
   ENTITY                   = 0,
+  ZOMBIE                   = 1
 };
 
 std::string getTypeEntityName(ENTITIES ID);
