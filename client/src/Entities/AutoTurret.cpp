@@ -1,4 +1,5 @@
 #include "AutoTurret.h"
+#include "../effects/particlemaker.h"
 
 AutoTurret::AutoTurret(Vector position) : Entity(position) {};
 
@@ -47,6 +48,8 @@ void AutoTurret::render(val ctx) {
   ctx.call<void>("restore");
 }
 
-void AutoTurret::tick() {
-  Entity::tick();
+void AutoTurret::tick(float delta) {
+  Entity::tick(delta);
+
+  createParticle(0, position.clone(), physics.size);
 }

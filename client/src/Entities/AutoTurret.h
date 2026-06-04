@@ -9,7 +9,7 @@ class AutoTurret : public Entity {
 
     void render(val ctx) override;
 
-    void tick() override;
+    void tick(float tick) override;
 
     void init() override;
 };

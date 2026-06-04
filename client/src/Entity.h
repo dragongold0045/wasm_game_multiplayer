@@ -110,7 +110,7 @@ class Entity {
 
     virtual ~Entity() = default;
 
-    virtual void tick();
+    virtual void tick(float delta);
 
     void updatePosition(Vector v);
 

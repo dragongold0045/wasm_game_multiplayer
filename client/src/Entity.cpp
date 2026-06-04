@@ -44,7 +44,7 @@ void Entity::updatePosition(Vector v) {
   else position.y = linear(position.y, v.y, 0.2f);
 }
 
-void Entity::tick() {}
+void Entity::tick(float delta) {}
 
 void Entity::setPosition(float x, float y) {
   position.x = x;

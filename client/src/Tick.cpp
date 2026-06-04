@@ -2,7 +2,9 @@
 #include "iostream"
 #include "enum.h"
 #include <emscripten/bind.h>
+#include <chrono>
 
+#include "./effects/particlemaker.h"
 #include "EntitiesList.h"
 
 using namespace std;
@@ -83,10 +85,46 @@ bool isControl() {
   return controllerID != "NO-CONTROL";
 }
 
+auto last_time = std::chrono::steady_clock::now();
+
 void Ticker(val ctx) {
+  auto current_time = std::chrono::steady_clock::now();
+  std::chrono::duration<float> elapsed = current_time - last_time;
+  float delta_time = elapsed.count();
+  last_time = current_time;
+
+  particlesToRemove.clear();
+
+  createParticle(0, Vector(-100, 0), 5);
+  createParticle(0, Vector(100, 0), 5);
+  createParticle(0, Vector(0, -100), 5);
+  createParticle(0, Vector(0, 100), 5);
+
+  for(auto &[id, particle] : particles) {
+    float hitsizeCamera = particle->size * 2;
+    if(
+      particle->position.x + hitsizeCamera < camera.position.x - camera.viewport.width / 2 ||
+      particle->position.y + hitsizeCamera < camera.position.y - camera.viewport.height / 2 ||
+      particle->position.x - hitsizeCamera > camera.position.x + camera.viewport.width / 2 ||
+      particle->position.y - hitsizeCamera > camera.position.y + camera.viewport.height / 2
+    ) {
+      particlesToRemove.push_back(id);
+      continue;
+    }
+
+    particle->tick(delta_time);
+
+    if(particle->alpha <= 0) continue;
+    particle->render(ctx);
+  }
+
+  for (const auto& id : particlesToRemove) {
+    removeParticle(id);
+  }
+
   for(auto &[id, entity] : entities) {
     if(id == controllerID) {
-        camera.moveTo(entity->position.x, entity->position.y);
+      camera.moveTo(entity->position.x, entity->position.y);
     }
 
     float hitsizeCamera = entity->physics.size * 2; 
@@ -98,7 +136,7 @@ void Ticker(val ctx) {
       entity->position.y - hitsizeCamera > camera.position.y + camera.viewport.height / 2
     ) continue;
 
-    entity->tick();
+    entity->tick(delta_time);
     entity->render(ctx);
 
     if(entity->visibleName) {
@@ -113,7 +151,7 @@ void Ticker(val ctx) {
       ctx.call<void>("strokeText", entity->relations.name.value, 0, -entity->physics.size - entity->offsetName);
       ctx.call<void>("restore");
     }
-  }
+  };
 }
 
 EMSCRIPTEN_BINDINGS(Tick) {
