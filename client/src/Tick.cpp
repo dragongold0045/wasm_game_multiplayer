@@ -87,6 +87,8 @@ bool isControl() {
 
 auto last_time = std::chrono::steady_clock::now();
 
+// TODO: fix camera viewport show/hide object
+
 void Ticker(val ctx) {
   auto current_time = std::chrono::steady_clock::now();
   std::chrono::duration<float> elapsed = current_time - last_time;
@@ -95,10 +97,17 @@ void Ticker(val ctx) {
 
   particlesToRemove.clear();
 
-  createParticle(0, Vector(-100, 0), 5);
-  createParticle(0, Vector(100, 0), 5);
-  createParticle(0, Vector(0, -100), 5);
-  createParticle(0, Vector(0, 100), 5);
+  const int points = 3;
+  const float range = 400;
+
+  for(float angle = 0; angle < M_PI*2; angle += M_PI*2 / points) {
+    Vector position(
+      std::cos(angle) * range,
+      std::sin(angle) * range
+    );
+
+    createParticle(0, position, 10);
+  };
 
   for(auto &[id, particle] : particles) {
     float hitsizeCamera = particle->size * 2;

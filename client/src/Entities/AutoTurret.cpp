@@ -51,5 +51,5 @@ void AutoTurret::render(val ctx) {
 void AutoTurret::tick(float delta) {
   Entity::tick(delta);
 
-  createParticle(0, position.clone(), physics.size);
+  // createParticle(0, position.clone(), physics.size);
 }

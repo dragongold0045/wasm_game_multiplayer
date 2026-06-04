@@ -29,6 +29,7 @@ val ctx;
 class Arena {
   public:
     float width = 500.0f, height = 500.0f;
+    string grindlineColor = "#111";
 
     Arena(float dw, float dh) {
       this->width = dw;
@@ -96,6 +97,8 @@ EMSCRIPTEN_BINDINGS(client_side) {
   .property("y", &Vector::y);
 }
 
+const int GRIND_SIZE = 100;
+
 extern "C" {
   // TEST output
   EMSCRIPTEN_KEEPALIVE
@@ -155,13 +158,54 @@ extern "C" {
     ctx.call<void>("clearRect", 0, 0, canvas["width"].as<int>(), canvas["height"].as<int>());
   
     ctx.call<void>("save");
-    ctx.call<void>("translate", -(camera.position.x - camera.viewport.width / 2), -(camera.position.y - camera.viewport.height / 2));
+    // TODO: limit camera view inside map - no outer map
+    // ctx.call<void>("translate", -(camera.position.x - camera.viewport.width / 2), -(camera.position.y - camera.viewport.height / 2));
+    float camX = camera.position.x - camera.viewport.width / 2,
+      camY = camera.position.y - camera.viewport.height / 2;
+
+    if (camX < -arena.width / 2)
+        camX = -arena.width / 2;
+    else if (camX > arena.width / 2 - camera.viewport.width)
+        camX = arena.width / 2 - camera.viewport.width;
+
+    if (camY < -arena.height / 2)
+        camY = -arena.height / 2;
+    else if (camY > arena.height / 2 - camera.viewport.height)
+        camY = arena.height / 2 - camera.viewport.height;
+    
+    ctx.call<void>("translate", -camX, -camY);
     ctx.call<void>("scale", camera.viewport.scale[0], camera.viewport.scale[1]);
 
-    // render arena
-    ctx.set("fillStyle", "#333");
-    ctx.call<void>("fillRect", -arena.width/2, -arena.height/2, arena.width, arena.height);
+    // render grind cell
+
+    const int WIDTH_GRIND = ceil(camera.viewport.width / GRIND_SIZE) * GRIND_SIZE;
+    const int HEIGHT_GRIND = ceil(camera.viewport.height / GRIND_SIZE) * GRIND_SIZE;
+
+    ctx.call<void>("beginPath");
     
+    ctx.set("lineWidth", 3);
+    ctx.set("strokeStyle", arena.grindlineColor);
+
+    // TODO: FIX line map
+    
+    for(int x = floor((camera.position.x - camera.viewport.width / 2) / GRIND_SIZE) * GRIND_SIZE; x < ceil((camera.position.x + camera.viewport.width / 2) / GRIND_SIZE) * GRIND_SIZE; x += GRIND_SIZE) {
+      ctx.call<void>("moveTo", x, camera.position.y - HEIGHT_GRIND/2);
+      ctx.call<void>("lineTo", x, camera.position.y + HEIGHT_GRIND/2);
+    }
+    for(int y = floor((camera.position.y - camera.viewport.width / 2) / GRIND_SIZE) * GRIND_SIZE; y < ceil((camera.position.y + camera.viewport.width / 2) / GRIND_SIZE) * GRIND_SIZE; y += GRIND_SIZE) {
+      ctx.call<void>("moveTo", camera.position.x - WIDTH_GRIND/2, y);
+      ctx.call<void>("lineTo", camera.position.x + WIDTH_GRIND/2, y);
+    }
+    
+    ctx.call<void>("stroke");
+    ctx.call<void>("closePath");
+
+    // render arena
+    ctx.set("fillStyle", "#33333370");
+    ctx.call<void>("fillRect", -arena.width/2, -arena.height/2, arena.width, arena.height);
+
+    // TODO: auto fill screen map. Limited by arena's size
+
     Ticker(ctx);
 
     ctx.call<void>("restore");
